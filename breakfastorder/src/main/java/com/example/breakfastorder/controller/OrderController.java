@@ -6,6 +6,7 @@ import com.example.breakfastorder.dto.ResponseDTO;
 import com.example.breakfastorder.entity.Order;
 import com.example.breakfastorder.entity.OrderStatus;
 import com.example.breakfastorder.service.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<ResponseDTO<Void>> createMenuItem(@RequestBody OrderDTO orderDTO){
+    public ResponseEntity<ResponseDTO<Void>> createMenuItem(@Valid @RequestBody OrderDTO orderDTO){
         try {
             orderService.createOrder(orderDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -42,8 +43,8 @@ public class OrderController {
             return ResponseEntity.badRequest().body(ResponseDTO.error(e.getMessage()));
         }
     }
-    @PutMapping("/{id}")
-    public ResponseEntity<ResponseDTO<Order>> updateOrder(@RequestBody OrderDTO orderDTO) {
+    @PutMapping
+    public ResponseEntity<ResponseDTO<Order>> updateOrder(@Valid @RequestBody OrderDTO orderDTO) {
         try {
             Order order = orderService.updateOrder(orderDTO);
             return ResponseEntity.ok().body(

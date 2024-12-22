@@ -83,7 +83,6 @@ public class UserServiceImpl implements UserService {
                 throw new InvalidTokenException("logout: Token already expired");
             }
 
-
             jwtBlackListService.addToBlackList(jti, expiration);
             log.info("logout: Token added to blacklist. JTI: {}, Expiration: {} seconds", jti, expiration);
             SecurityContextHolder.clearContext();

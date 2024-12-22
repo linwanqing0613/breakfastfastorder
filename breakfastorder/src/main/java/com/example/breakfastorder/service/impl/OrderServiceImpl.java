@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -42,24 +42,24 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void createOrder(OrderDTO orderDTO) {
         User currentUser = validateTokenAndGetUser();
-        if(orderDTO.getId() != null && orderRepository.existsById(orderDTO.getId())){
-            throw new RuntimeException("Order with ID " + orderDTO.getId() + " already exists.");
+        if(orderDTO.getId() != null){
+            throw new RuntimeException("ID must be null for new Order.");
         }
 
         if (orderDTO.getUser() == null) {
+            log.info("No user provided in OrderDTO. Using the authenticated user (ID: {}).", currentUser.getId());
             orderDTO.setUser(convertToUserDTO(currentUser));
         } else {
-            if (!orderDTO.getUser().getPhone().equals(currentUser.getPhone())) {
-                throw new RuntimeException("User mismatch: Cannot create order for a different user.");
-            }
-            if(!passwordEncoder.matches(orderDTO.getUser().getPassword(), currentUser.getPassword())){
+            User user = userRepository.findByPhone(orderDTO.getUser().getPhone())
+                    .orElseThrow(() -> new RuntimeException("Cannot create order for a non-existing user."));
+            if(!passwordEncoder.matches(orderDTO.getUser().getPassword(), user.getPassword())){
                 throw new RuntimeException("Authentication failed: Invalid password.");
             }
-            orderDTO.setId(currentUser.getId());
+            orderDTO.setUser(convertToUserDTO(user));
         }
         Order order = convertToEntity(orderDTO);
         orderRepository.save(order);
-        log.info("Order created successfully: {}", order);
+        log.info("Order created successfully by user {} with order details: {}", currentUser.getPhone(), order);
     }
 
     @Override
@@ -138,8 +138,8 @@ public class OrderServiceImpl implements OrderService {
         return order;
     }
     private void updateEntityFromDTO(Order order, OrderDTO orderDTO){
-        if(orderDTO.getTotalPrice() != null){
-            order.setTotalPrice(orderDTO.getTotalPrice());
+        if(orderDTO.getUser() != null){
+            order.setUser(convertToEntity(orderDTO.getUser()));
         }
         if(orderDTO.getStatus() != null){
             order.setStatus(orderDTO.getStatus());
@@ -153,6 +153,9 @@ public class OrderServiceImpl implements OrderService {
         String phone = jwtTokenProvider.getPhoneNumberFromToken(token);
         return userRepository.findByPhone(phone)
                 .orElseThrow(() -> new RuntimeException("User not found for token: " + phone));
+    }
+    private User convertToEntity(UserDTO userDTO) {
+        return new User(userDTO.getId());
     }
     private UserDTO convertToUserDTO(User user) {
         return new UserDTO(user.getId(), user.getUsername(), user.getPhone(), user.getPassword());

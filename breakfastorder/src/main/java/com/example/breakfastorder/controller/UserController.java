@@ -5,6 +5,7 @@ import com.example.breakfastorder.dto.ResponseDTO;
 import com.example.breakfastorder.dto.UserDTO;
 import com.example.breakfastorder.service.UserService;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<ResponseDTO<Void>> register(@RequestBody UserDTO userDTO){
+    public ResponseEntity<ResponseDTO<Void>> register(@Valid @RequestBody UserDTO userDTO){
         try {
             userService.register(userDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -29,7 +30,7 @@ public class UserController {
         }
     }
     @PostMapping("/login")
-    public ResponseEntity<ResponseDTO<String>> login(@RequestBody LoginDTO loginDTO){
+    public ResponseEntity<ResponseDTO<String>> login(@Valid @RequestBody LoginDTO loginDTO){
         try {
             String token = userService.login(loginDTO);
             return ResponseEntity.ok(
@@ -51,7 +52,7 @@ public class UserController {
         }
     }
     @DeleteMapping("/{phone}")
-    public ResponseEntity<ResponseDTO<Void>> deleteUserAccount(@RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<ResponseDTO<Void>> deleteUserAccount(@Valid @RequestBody LoginDTO loginDTO) {
         try {
             userService.deleteUserAccount(loginDTO);
             return ResponseEntity.ok(

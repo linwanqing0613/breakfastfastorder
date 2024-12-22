@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "user")
 public class User {
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,6 +41,10 @@ public class User {
     }
 
     public User() {
+    }
+
+    public User(Long id) {
+        this.id = id;
     }
 
     public Long getId() {

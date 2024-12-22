@@ -20,8 +20,8 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     public void createMenuItem(MenuItemDTO menuItemDTO) {
-        if(menuItemRepository.existsById(menuItemDTO.getId())){
-            throw new RuntimeException("Menu item with ID " + menuItemDTO.getId() + " already exists.");
+        if(menuItemDTO.getId() != null){
+            throw new RuntimeException("ID must be null for new menu items.");
         }
         MenuItem menuItem = convertToEntity(menuItemDTO);
         menuItemRepository.save(menuItem);

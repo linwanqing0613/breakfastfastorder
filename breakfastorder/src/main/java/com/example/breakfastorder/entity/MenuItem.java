@@ -1,5 +1,6 @@
 package com.example.breakfastorder.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -8,7 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "menu_item")
 public class MenuItem {
-
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -44,7 +45,9 @@ public class MenuItem {
 
     public MenuItem() {
     }
-
+    public MenuItem(Long id) {
+        this.id = id;
+    }
     public Long getId() {
         return id;
     }

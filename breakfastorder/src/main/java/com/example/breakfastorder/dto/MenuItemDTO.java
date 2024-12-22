@@ -1,15 +1,19 @@
 package com.example.breakfastorder.dto;
 
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import org.springframework.lang.Nullable;
 
 import java.math.BigDecimal;
 
 public class MenuItemDTO {
 
+    @Nullable
     private Long id;
+
     @NotBlank(message = "Name is required")
     private String name;
 
