@@ -1,6 +1,7 @@
 package com.example.breakfastorder.controller;
 
 import com.example.breakfastorder.dto.LoginDTO;
+import com.example.breakfastorder.dto.ResponseDTO;
 import com.example.breakfastorder.dto.UserDTO;
 import com.example.breakfastorder.service.UserService;
 
@@ -17,39 +18,47 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody UserDTO userDTO){
+    public ResponseEntity<ResponseDTO<Void>> register(@RequestBody UserDTO userDTO){
         try {
             userService.register(userDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+            return ResponseEntity.status(HttpStatus.CREATED).body(
+                    ResponseDTO.create("User registered successfully", null)
+            );
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.badRequest().body(ResponseDTO.error(e.getMessage()));
         }
     }
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDTO loginDTO){
+    public ResponseEntity<ResponseDTO<String>> login(@RequestBody LoginDTO loginDTO){
         try {
             String token = userService.login(loginDTO);
-            return ResponseEntity.ok(token);
+            return ResponseEntity.ok(
+                    ResponseDTO.success("User logged out successfully", token)
+            );
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+            return ResponseEntity.badRequest().body(ResponseDTO.error(e.getMessage()));
         }
     }
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
+    @GetMapping("/logout")
+    public ResponseEntity<ResponseDTO<Void>> logout() {
         try {
             userService.logout();
-            return ResponseEntity.ok("User logged out successfully");
+            return ResponseEntity.ok(
+                    ResponseDTO.success("User logged out successfully", null)
+            );
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(ResponseDTO.error(e.getMessage()));
         }
     }
     @DeleteMapping("/{phone}")
-    public ResponseEntity<String> deleteUserAccount(@RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<ResponseDTO<Void>> deleteUserAccount(@RequestBody LoginDTO loginDTO) {
         try {
             userService.deleteUserAccount(loginDTO);
-            return ResponseEntity.ok("User account deleted successfully");
+            return ResponseEntity.ok(
+                    ResponseDTO.success("User account deleted successfully", null)
+            );
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(ResponseDTO.error(e.getMessage()));
         }
     }
 }
